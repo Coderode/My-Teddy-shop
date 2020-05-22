@@ -2,3 +2,18 @@
 
 {% block title%}Checkout | My Teddy Shop{% endblock %}
 {% block body %} This is checkout page {% endblock %}
+{% block js %}
+<script>
+    // Find out the cart items from localStorage
+    if (localStorage.getItem('cart') == null) {
+        var cart = {};
+    } else {
+        cart = JSON.parse(localStorage.getItem('cart'));
+        var items=0;
+        for(var key in cart){
+            items+=cart[key];
+        }
+        document.getElementById('cart').innerHTML = items;
+    }
+</script>
+{% endblock %}

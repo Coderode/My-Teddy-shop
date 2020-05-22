@@ -57,6 +57,15 @@ padding:10px;
   padding:0;
   margin:0;
 }
+.card-footer{
+  background-color:white;
+  border-bottom:1px solid lightgrey;
+  border-top:none;
+}
+.carousel-indicators{
+  position:relative;
+  top:102%;
+}
 
 {% endblock %}
 
@@ -67,10 +76,10 @@ padding:10px;
 <div class="container-fluid my-4">
   <!--Slideshow starts here -->
   {% for product, range, nSlides in allProds %}
-    <div class="container my-4">
-      <h4 class="my-4">Flash Sale On - {{product.0.category}} : Recommended Items</h4>
+    <div class="container mb-5">
+      <h4 class="my-0 py-0">Flash Sale On - {{product.0.category}} : Recommended Items</h4>
       <div class="row">
-        <div id="demo{{forloop.counter}}" class="col carousel slide my-4" data-ride="carousel">
+        <div id="demo{{forloop.counter}}" class="col carousel slide mt-0" data-ride="carousel">
           <ul class="carousel-indicators">
             <li data-target="#demo{{forloop.counter}}" data-slide-to="0" class="active"></li>
 
@@ -92,7 +101,9 @@ padding:10px;
                         <p class="card-text float-right"><b>Rs.{{i.price}}</b></p>
                       </div>
                       <div class="card-footer">
-                        <button id="pr{{i.id}}" class="btn btn-primary btn-sm cart">Add to Cart</button>
+                        <span id="divpr{{i.id}}" class="divpr">
+                          <button id="pr{{i.id}}" class="btn btn-primary btn-sm cart">Add To Cart</button>
+                        </span>
                         <a href="/shop/products/{{i.id}}">
                           <button id="qv{{i.id}}" class="float-right btn btn-primary btn-sm cart">QuickView</button>
                         </a>
@@ -124,7 +135,26 @@ padding:10px;
 
 {% block js %}
 <script>
+  // Find out the cart items from localStorage
+  if (localStorage.getItem('cart') == null) {
+      var cart = {};
+  } else {
+      cart = JSON.parse(localStorage.getItem('cart'));
+      updateCart(cart);
+  }
 
+  function updateCart(cart) {
+    var items=0;
+    for (var item in cart) {
+        if(cart[item]>0){
+          document.getElementById('div' + item).innerHTML = "<button id='minus" + item + "' class='btn btn-primary btn-sm minus'>-</button> <span id='val" + item + "''>" + cart[item] + "</span> <button id='plus" + item + "' class='btn btn-primary btn-sm plus'> + </button>";
+        }
+        items += cart[item];
+    }
+    localStorage.setItem('cart', JSON.stringify(cart));
+    document.getElementById('cart').innerHTML = items;
+    //document.getElementById('cart').innerHTML = Object.keys(cart).length;
+  }
   //method on click of the add to card button
   $('.cart').click(function () {
     var idstr = this.id.toString();
@@ -133,17 +163,21 @@ padding:10px;
     } else {
       cart[idstr] = 1;
     }
-    //console.log(cart);
-    
-    localStorage.setItem('cart', JSON.stringify(cart));
-    //document.getElementById('cart').innerHTML = Object.keys(cart).length;
-
-    //getting total number of items may be of same or diff type
-    var items=0;
-    for(key in cart){
-        items += cart[key];
-    }
-    document.getElementById('cart').innerHTML = items;
+    updateCart(cart);
+  });
+  // If plus or minus button is clicked, change the cart as well as the display value
+  $('.divpr').on("click", "button.minus", function() {
+      a = this.id.slice(7, );
+      cart['pr' + a] = cart['pr' + a] - 1;
+      cart['pr' + a] = Math.max(0, cart['pr' + a]);
+      document.getElementById('valpr' + a).innerHTML = cart['pr' + a];
+      updateCart(cart);
+  });
+  $('.divpr').on("click", "button.plus", function() {
+      a = this.id.slice(6, );
+      cart['pr' + a] = cart['pr' + a] + 1;
+      document.getElementById('valpr' + a).innerHTML = cart['pr' + a];
+      updateCart(cart);
   });
 
   $("#navHome").addClass("active");

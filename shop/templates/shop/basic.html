@@ -76,19 +76,7 @@
         integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
         crossorigin="anonymous"></script>
     <script>
-        //updating the cart 
-        if (localStorage.getItem('cart') == null) {
-            var cart = {};
-        } else {
-            cart = JSON.parse(localStorage.getItem('cart'));
-            var items=0;
-            for(key in cart){
-                items += cart[key];
-            }
-            document.getElementById('cart').innerHTML = items;
-            //document.getElementById('cart').innerHTML = Object.keys(cart).length;
-        }
-        //for popover
+        //Add Popover to cart
         $('#popcart').popover();
         document.getElementById('popcart').setAttribute('data-content','<h6>Cart for your selected items at My Teddy shoop</h6>');
     </script>
