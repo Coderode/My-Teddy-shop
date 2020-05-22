@@ -37,7 +37,7 @@ height:40px;
 .carousel-control-next{
 top: auto;
 bottom: auto;
-padding-top:11%;
+padding-top:13%;
 }
 .card-body h6{
 padding:2px;
@@ -88,10 +88,14 @@ padding:10px;
                       <img src='/media/{{i.image}}' class="card-img-top" alt="...">
                       <div class="card-body">
                         <h6 class="card-title">{{i.product_name}}</h6>
-                        <p class="card-text">{{i.desc}}</p>
+                        <p class="card-text">{{i.desc|slice:"0:23"}}...</p>
+                        <p class="card-text float-right"><b>Rs.{{i.price}}</b></p>
                       </div>
                       <div class="card-footer">
                         <button id="pr{{i.id}}" class="btn btn-primary btn-sm cart">Add to Cart</button>
+                        <a href="/shop/products/{{i.id}}">
+                          <button id="qv{{i.id}}" class="float-right btn btn-primary btn-sm cart">QuickView</button>
+                        </a>
                       </div>
                     </div>
                   </div>
@@ -120,12 +124,8 @@ padding:10px;
 
 {% block js %}
 <script>
-  if (localStorage.getItem('cart') == null) {
-    var cart = {};
-  } else {
-    cart = JSON.parse(localStorage.getItem('cart'));
-    document.getElementById('cart').innerHTML = Object.keys(cart).length;
-  }
+
+  //method on click of the add to card button
   $('.cart').click(function () {
     var idstr = this.id.toString();
     if (cart[idstr] != undefined) {
@@ -134,10 +134,18 @@ padding:10px;
       cart[idstr] = 1;
     }
     //console.log(cart);
+    
     localStorage.setItem('cart', JSON.stringify(cart));
-    document.getElementById('cart').innerHTML = Object.keys(cart).length;
+    //document.getElementById('cart').innerHTML = Object.keys(cart).length;
+
+    //getting total number of items may be of same or diff type
+    var items=0;
+    for(key in cart){
+        items += cart[key];
+    }
+    document.getElementById('cart').innerHTML = items;
   });
-  $('#popcart').popover();
-  document.getElementById('popcart').setAttribute('data-content','<h6>Cart for your selected items at My Teddy shoop</h6>');
+
+  $("#navHome").addClass("active");
 </script>
 {% endblock %}

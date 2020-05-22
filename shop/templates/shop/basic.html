@@ -27,16 +27,16 @@
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="/shop">Home <span class="sr-only">(current)</span></a>
+                <li class="nav-item" id="navHome">
+                    <a class="nav-link" href="/shop">Home</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" id="navTracker">
                     <a class="nav-link" href="/shop/tracker">Tracker</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" id="navAbout">
                     <a class="nav-link" href="/shop/about">About Us</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" id="navContact">
                     <a class="nav-link" href="/shop/contact">Contact Us</a>
                 </li>
             </ul>
@@ -49,6 +49,17 @@
             </button>
         </div>
     </nav>
+    {% comment %} template for showing alert messages {% endcomment %}
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{message.tags}} alert-dismissible fade show my-0" role="alert">
+      <strong>{{message}}</strong>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    {% endfor %}
+    {% endif %}
     {% block body %} {% endblock %}
 
 
@@ -64,6 +75,23 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
         integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
         crossorigin="anonymous"></script>
+    <script>
+        //updating the cart 
+        if (localStorage.getItem('cart') == null) {
+            var cart = {};
+        } else {
+            cart = JSON.parse(localStorage.getItem('cart'));
+            var items=0;
+            for(key in cart){
+                items += cart[key];
+            }
+            document.getElementById('cart').innerHTML = items;
+            //document.getElementById('cart').innerHTML = Object.keys(cart).length;
+        }
+        //for popover
+        $('#popcart').popover();
+        document.getElementById('popcart').setAttribute('data-content','<h6>Cart for your selected items at My Teddy shoop</h6>');
+    </script>
     {% block js %}{% endblock %}
 </body>
 
