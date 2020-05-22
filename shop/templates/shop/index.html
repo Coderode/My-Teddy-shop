@@ -1,0 +1,143 @@
+{% extends 'shop/basic.html' %}
+
+{% block title%}My Teddy Shop{% endblock %}
+
+{% block css %}
+.carousel-indicators .active{
+background-color: blue;
+}
+.card img{
+height:200px;
+width:100%;
+}
+
+body .carousel-indicators li {
+background-color: blue;
+}
+
+body .carousel-indicators {
+bottom: 0;
+}
+
+body .no-padding {
+padding-left: 0;
+padding-right: 0;
+}
+.carousel-control-prev-icon{
+background-color:lightblue;
+width:20px;
+height:40px;
+}
+.carousel-control-next-icon{
+background-color:lightblue;
+width:20px;
+height:40px;
+}
+.carousel-control-prev,
+.carousel-control-next{
+top: auto;
+bottom: auto;
+padding-top:11%;
+}
+.card-body h6{
+padding:2px;
+margin:0;
+}
+.card-body p{
+padding:2px;
+margin:0;
+}
+.card-body{
+padding:10px;
+}
+.card-footer{
+padding:10px;
+}
+.col-xs-3, .col-sm-3, .col-md-3{
+  padding:0;
+  margin:0;
+}
+
+{% endblock %}
+
+{% block body %}
+
+{% load static %}
+
+<div class="container-fluid my-4">
+  <!--Slideshow starts here -->
+  {% for product, range, nSlides in allProds %}
+    <div class="container my-4">
+      <h4 class="my-4">Flash Sale On - {{product.0.category}} : Recommended Items</h4>
+      <div class="row">
+        <div id="demo{{forloop.counter}}" class="col carousel slide my-4" data-ride="carousel">
+          <ul class="carousel-indicators">
+            <li data-target="#demo{{forloop.counter}}" data-slide-to="0" class="active"></li>
+
+            {% for i in range %}
+            <li data-target="#demo{{forloop.parentloop.counter}}" data-slide-to="{{i}}"></li>
+            {% endfor %}
+          </ul>
+          <!-- creating slideshow -->
+          <div class="container carousel-inner no-padding">
+            <div class="carousel-item active">
+              <div class="card-group">
+                {% for i in product %}
+                  <div class="col-xs-3 col-sm-3 col-md-3">
+                    <div class="card h-100" style="width: 100%">
+                      <img src='/media/{{i.image}}' class="card-img-top" alt="...">
+                      <div class="card-body">
+                        <h6 class="card-title">{{i.product_name}}</h6>
+                        <p class="card-text">{{i.desc}}</p>
+                      </div>
+                      <div class="card-footer">
+                        <button id="pr{{i.id}}" class="btn btn-primary btn-sm cart">Add to Cart</button>
+                      </div>
+                    </div>
+                  </div>
+                    {% if forloop.counter|divisibleby:4 and forloop.counter > 0 and not forloop.last %}
+                      </div></div><div class="carousel-item"><div class="card-group">
+                    {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- left and right control for slide show -->
+        <a class="carousel-control-prev" href="#demo{{forloop.counter}}" role="button" data-slide="prev">
+          <span class="carousel-control-prev-icon"></span>
+        </a>
+        <a class="carousel-control-next" href="#demo{{forloop.counter}}" role="button" data-slide="next">
+          <span class="carousel-control-next-icon"></span>
+        </a>
+        <hr>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script>
+  if (localStorage.getItem('cart') == null) {
+    var cart = {};
+  } else {
+    cart = JSON.parse(localStorage.getItem('cart'));
+    document.getElementById('cart').innerHTML = Object.keys(cart).length;
+  }
+  $('.cart').click(function () {
+    var idstr = this.id.toString();
+    if (cart[idstr] != undefined) {
+      cart[idstr] = cart[idstr] + 1;
+    } else {
+      cart[idstr] = 1;
+    }
+    //console.log(cart);
+    localStorage.setItem('cart', JSON.stringify(cart));
+    document.getElementById('cart').innerHTML = Object.keys(cart).length;
+  });
+  $('#popcart').popover();
+  document.getElementById('popcart').setAttribute('data-content','<h6>Cart for your selected items at My Teddy shoop</h6>');
+</script>
+{% endblock %}
