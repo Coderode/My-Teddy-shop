@@ -37,7 +37,7 @@ height:40px;
 .carousel-control-next{
 top: auto;
 bottom: auto;
-padding-top:13%;
+padding-top:11%;
 }
 .card-body h6{
 padding:2px;
@@ -96,16 +96,16 @@ padding:10px;
                     <div class="card h-100" style="width: 100%">
                       <img src='/media/{{i.image}}' class="card-img-top" alt="...">
                       <div class="card-body">
-                        <h6 class="card-title">{{i.product_name}}</h6>
+                        <h6 class="card-title" id="namepr{{i.id}}">{{i.product_name}}</h6>
                         <p class="card-text">{{i.desc|slice:"0:23"}}...</p>
                         <p class="card-text float-right"><b>Rs.{{i.price}}</b></p>
                       </div>
                       <div class="card-footer">
                         <span id="divpr{{i.id}}" class="divpr">
-                          <button id="pr{{i.id}}" class="btn btn-primary btn-sm cart">Add To Cart</button>
+                          <button id="pr{{i.id}}" class="btn btn-primary btn-sm cart" value="{{i.product_name}}">Add To Cart</button>
                         </span>
                         <a href="/shop/products/{{i.id}}">
-                          <button id="qv{{i.id}}" class="float-right btn btn-primary btn-sm cart">QuickView</button>
+                          <button id="qv{{i.id}}" class="float-right btn btn-primary btn-sm cart">View</button>
                         </a>
                       </div>
                     </div>
@@ -140,46 +140,66 @@ padding:10px;
       var cart = {};
   } else {
       cart = JSON.parse(localStorage.getItem('cart'));
-      updateCart(cart);
   }
+  updateCart(cart);
+  //ACTIONS
 
-  function updateCart(cart) {
-    var items=0;
-    for (var item in cart) {
-        if(cart[item]>0){
-          document.getElementById('div' + item).innerHTML = "<button id='minus" + item + "' class='btn btn-primary btn-sm minus'>-</button> <span id='val" + item + "''>" + cart[item] + "</span> <button id='plus" + item + "' class='btn btn-primary btn-sm plus'> + </button>";
-        }
-        items += cart[item];
-    }
-    localStorage.setItem('cart', JSON.stringify(cart));
-    document.getElementById('cart').innerHTML = items;
-    //document.getElementById('cart').innerHTML = Object.keys(cart).length;
-  }
   //method on click of the add to card button
-  $('.cart').click(function () {
+  $('.divpr').on('click', 'button.cart', function(){
     var idstr = this.id.toString();
+    var itemName = document.getElementById(idstr).value.toString();
     if (cart[idstr] != undefined) {
-      cart[idstr] = cart[idstr] + 1;
+      cart[idstr].qty = cart[idstr].qty + 1;
     } else {
-      cart[idstr] = 1;
+      cart[idstr] = {'qty':1,'itemName':itemName};
     }
     updateCart(cart);
   });
+  
   // If plus or minus button is clicked, change the cart as well as the display value
   $('.divpr').on("click", "button.minus", function() {
       a = this.id.slice(7, );
-      cart['pr' + a] = cart['pr' + a] - 1;
-      cart['pr' + a] = Math.max(0, cart['pr' + a]);
-      document.getElementById('valpr' + a).innerHTML = cart['pr' + a];
+      cart['pr' + a].qty = cart['pr' + a].qty - 1;
+      cart['pr' + a].qty = Math.max(0, cart['pr' + a].qty);
+      if(cart['pr'+a].qty == 0){
+        document.getElementById('divpr' + a).innerHTML = '<button id="pr' + a + '" class="btn btn-primary btn-sm cart" value="'+cart['pr'+a].itemName+'">Add To Cart</button>';
+      }else{
+        document.getElementById('valpr' + a).innerHTML = cart['pr' + a].qty;
+      }
       updateCart(cart);
   });
   $('.divpr').on("click", "button.plus", function() {
       a = this.id.slice(6, );
-      cart['pr' + a] = cart['pr' + a] + 1;
-      document.getElementById('valpr' + a).innerHTML = cart['pr' + a];
+      cart['pr' + a].qty = cart['pr' + a].qty + 1;
+      document.getElementById('valpr' + a).innerHTML = cart['pr' + a].qty;
       updateCart(cart);
   });
 
+  //make the Home link active at navbar
   $("#navHome").addClass("active");
+
+  //FUNCTIONS
+  //function to update the cart button value and set new item added to cart
+  function updateCart(cart) {
+    for (var item in cart) {
+      if(cart[item].qty>0){
+        document.getElementById('div' + item).innerHTML = "<button id='minus" + item + "' class='btn btn-primary btn-sm minus'>-</button> <span id='val" + item + "''>" + cart[item].qty + "</span> <button id='plus" + item + "' class='btn btn-primary btn-sm plus'> + </button>";
+      }
+    }
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartModal(cart);
+  }
+  //function to clear the cart
+  function clearCart() {
+      cart = JSON.parse(localStorage.getItem('cart'));
+      for (var item in cart) {
+          document.getElementById('div' + item).innerHTML = '<button id="' + item + '" class="btn btn-primary btn-sm cart" value="'+cart[item].itemName+'">Add To Cart</button>';
+      }
+      localStorage.clear();
+      cart = {};
+      updateCart(cart);
+  }
+  
+  
 </script>
 {% endblock %}

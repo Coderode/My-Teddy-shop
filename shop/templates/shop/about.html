@@ -67,12 +67,16 @@
       var cart = {};
   } else {
       cart = JSON.parse(localStorage.getItem('cart'));
-      var items=0;
-      for(var key in cart){
-          items+=cart[key];
-      }
-      document.getElementById('cart').innerHTML = items;
   }
+  updateCartModal(cart);
+  
   $("#navAbout").addClass("active");
+
+  function clearCart() {
+      cart = JSON.parse(localStorage.getItem('cart'));
+      localStorage.clear();
+      cart = {};
+      updateCartModal(cart);
+  }
 </script>
 {% endblock %}

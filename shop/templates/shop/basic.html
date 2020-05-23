@@ -44,9 +44,10 @@
                 <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
                 <button class="btn btn-outline-light my-2 my-sm-0" type="submit">Search</button>
             </form>
-            <button type="button" class="btn btn-secondary mx-2" data-container="body" id="popcart" data-toggle="popover" data-placement="bottom" data-html="true" data-content="example">
-                Cart(<span id="cart">0</span>)
+            <!-- Button trigger modal -->
+            <button type="button" class="btn btn-light mx-2" data-toggle="modal" data-target="#mycartModal" id="modalcart">Cart(<span id="cart">0</span>)
             </button>
+            {% comment %} <button type="button" class="btn btn-secondary mx-2" data-container="body" id="popcart" data-toggle="popover" data-placement="bottom" data-html="true" data-content="example"></button> {% endcomment %}
         </div>
     </nav>
     {% comment %} template for showing alert messages {% endcomment %}
@@ -61,7 +62,27 @@
     {% endfor %}
     {% endif %}
     {% block body %} {% endblock %}
-
+    <!-- Modal -->
+    <div class="modal fade" id="mycartModal" tabindex="-1" role="dialog" aria-labelledby="mycartModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="mycartModalLabel">My Teddy Shop Cart</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div id="cartModalBody" class="modal-body">
+            
+        </div>
+        <div class="modal-footer">
+            <a href='/shop/checkout' id ='checkout' class="btn btn-danger">Checkout</a>
+            <button class='mx-2 btn btn-warning' onclick='clearCart()' id ='clearCart'>Clear Cart</button>
+            <button type="button" class="float-left btn btn-dark" data-dismiss="modal">Close</button>  
+        </div>
+        </div>
+    </div>
+    </div>
 
 
     <!-- Optional JavaScript -->
@@ -76,9 +97,33 @@
         integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
         crossorigin="anonymous"></script>
     <script>
-        //Add Popover to cart
-        $('#popcart').popover();
-        document.getElementById('popcart').setAttribute('data-content','<h6>Cart for your selected items at My Teddy shoop</h6>');
+        //function to update the cart popover in navbar with items
+        function updateCartModal(cart){
+            var popStr = "<div>";
+            popStr += "<table class='table table-sm'><thead class='thead-dark'><tr><th scope='col'>#</th><th scope='col'>Item</th><th scope='col'>Qty</th></tr></thead><tbody>";
+            var i = 1;
+            var sum=0;
+            for (var item in cart){
+                if(cart[item].qty>0){
+                    popStr+="<tr><th scope='row'>"+i+"</th><td>";
+                    popStr = popStr + cart[item].itemName+ "</td><td>" + cart[item].qty + "</td></tr>";
+                    i = i+1;
+                }
+                sum=sum+cart[item].qty;
+            }
+            popStr+="</tbody></table></div>";
+            popStr+="<h6 style='color:white; background-color:black; padding:10px;'>Total Items : "+sum+"</h6>";
+            if(sum==0){
+                popStr = "<p>Nothing in Your cart! :-(</p>";
+                $('#checkout').addClass("disabled");
+                $('#clearCart').prop('disabled', true);
+            }else{
+                $('#checkout').removeClass("disabled");
+                $('#clearCart').prop('disabled', false);
+            }
+            document.getElementById('cart').innerHTML = sum;
+            document.getElementById('cartModalBody').innerHTML=popStr;
+        }
     </script>
     {% block js %}{% endblock %}
 </body>
