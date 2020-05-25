@@ -98,11 +98,11 @@ padding:10px;
                       <div class="card-body">
                         <h6 class="card-title" id="namepr{{i.id}}">{{i.product_name}}</h6>
                         <p class="card-text">{{i.desc|slice:"0:23"}}...</p>
-                        <p class="card-text float-right"><b>Rs.{{i.price}}</b></p>
+                        <p class="card-text float-right"><b>Rs.<span id="pricepr{{i.id}}">{{i.price}}</span></b></p>
                       </div>
                       <div class="card-footer">
                         <span id="divpr{{i.id}}" class="divpr">
-                          <button id="pr{{i.id}}" class="btn btn-primary btn-sm cart" value="{{i.product_name}}">Add To Cart</button>
+                          <button id="pr{{i.id}}" class="btn btn-primary btn-sm cart">Add To Cart</button>
                         </span>
                         <a href="/shop/products/{{i.id}}">
                           <button id="qv{{i.id}}" class="float-right btn btn-primary btn-sm cart">View</button>
@@ -146,12 +146,16 @@ padding:10px;
 
   //method on click of the add to card button
   $('.divpr').on('click', 'button.cart', function(){
+    //id of item clicked pr{{id}}
     var idstr = this.id.toString();
-    var itemName = document.getElementById(idstr).value.toString();
+    var itemName = document.getElementById('name'+idstr).innerHTML;
+    var price = parseInt(document.getElementById('price'+idstr).innerHTML);
     if (cart[idstr] != undefined) {
+      //increase the quantity if already exist
       cart[idstr].qty = cart[idstr].qty + 1;
     } else {
-      cart[idstr] = {'qty':1,'itemName':itemName};
+      //storing quantity and its name in localStorage (console it)
+      cart[idstr] = {'qty':1,'itemName':itemName,'price':price};
     }
     updateCart(cart);
   });
@@ -162,7 +166,7 @@ padding:10px;
       cart['pr' + a].qty = cart['pr' + a].qty - 1;
       cart['pr' + a].qty = Math.max(0, cart['pr' + a].qty);
       if(cart['pr'+a].qty == 0){
-        document.getElementById('divpr' + a).innerHTML = '<button id="pr' + a + '" class="btn btn-primary btn-sm cart" value="'+cart['pr'+a].itemName+'">Add To Cart</button>';
+        document.getElementById('divpr' + a).innerHTML = '<button id="pr' + a + '" class="btn btn-primary btn-sm cart">Add To Cart</button>';
       }else{
         document.getElementById('valpr' + a).innerHTML = cart['pr' + a].qty;
       }
@@ -193,7 +197,7 @@ padding:10px;
   function clearCart() {
       cart = JSON.parse(localStorage.getItem('cart'));
       for (var item in cart) {
-          document.getElementById('div' + item).innerHTML = '<button id="' + item + '" class="btn btn-primary btn-sm cart" value="'+cart[item].itemName+'">Add To Cart</button>';
+          document.getElementById('div' + item).innerHTML = '<button id="' + item + '" class="btn btn-primary btn-sm cart">Add To Cart</button>';
       }
       localStorage.clear();
       cart = {};

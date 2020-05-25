@@ -36,6 +36,9 @@
                 <li class="nav-item" id="navAbout">
                     <a class="nav-link" href="/shop/about">About Us</a>
                 </li>
+                <li class="nav-item" id="blog">
+                    <a class="nav-link" href="/blog">Blog</a>
+                </li>
                 <li class="nav-item" id="navContact">
                     <a class="nav-link" href="/shop/contact">Contact Us</a>
                 </li>
@@ -78,7 +81,7 @@
         <div class="modal-footer">
             <a href='/shop/checkout' id ='checkout' class="btn btn-danger">Checkout</a>
             <button class='mx-2 btn btn-warning' onclick='clearCart()' id ='clearCart'>Clear Cart</button>
-            <button type="button" class="float-left btn btn-dark" data-dismiss="modal">Close</button>  
+            <button type="button" class="float-left btn btn-primary" data-dismiss="modal">Close</button>  
         </div>
         </div>
     </div>
@@ -87,20 +90,19 @@
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
-        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
-        crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
         integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
         crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
         integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
         crossorigin="anonymous"></script>
+        
     <script>
         //function to update the cart popover in navbar with items
         function updateCartModal(cart){
             var popStr = "<div>";
-            popStr += "<table class='table table-sm'><thead class='thead-dark'><tr><th scope='col'>#</th><th scope='col'>Item</th><th scope='col'>Qty</th></tr></thead><tbody>";
+            popStr += "<table class='table table-sm'><thead class='thead bg-primary' style='color:white;'><tr ><th scope='col'>#</th><th scope='col'>Item</th><th scope='col'>Qty</th></tr></thead><tbody>";
             var i = 1;
             var sum=0;
             for (var item in cart){
@@ -112,7 +114,7 @@
                 sum=sum+cart[item].qty;
             }
             popStr+="</tbody></table></div>";
-            popStr+="<h6 style='color:white; background-color:black; padding:10px;'>Total Items : "+sum+"</h6>";
+            popStr+="<h6 style='color:white; padding:10px;'class='bg-primary'>Total Items : "+sum+"</h6>";
             if(sum==0){
                 popStr = "<p>Nothing in Your cart! :-(</p>";
                 $('#checkout').addClass("disabled");
@@ -124,6 +126,10 @@
             document.getElementById('cart').innerHTML = sum;
             document.getElementById('cartModalBody').innerHTML=popStr;
         }
+        {% comment %} cart
+        {pr20: {…}}
+        delete cart["pr20"]
+        true {% endcomment %}
     </script>
     {% block js %}{% endblock %}
 </body>

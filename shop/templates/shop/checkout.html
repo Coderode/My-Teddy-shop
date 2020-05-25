@@ -1,7 +1,65 @@
 {% extends 'shop/basic.html' %}
 
 {% block title%}Checkout | My Teddy Shop{% endblock %}
-{% block body %} This is checkout page {% endblock %}
+{% block body %}
+<div class="container">
+    <div class="col my-4">
+        <h3>Step 1 - My Teddy Shop Express Checkout - Review Your Cart Items</h3>
+        <div class="my-4">
+            <ul class="list-group" id="items">
+            </ul>
+        </div>
+        <div class="alert alert-secondary" role="alert">
+            <h5>Total Price : <p class="float-right"><b>Rs. <span id="totalPrice">0</span></b></p><h5>
+        </div>
+    </div>
+    <div class="col my-4">
+        <h3>Step 2 - Enter Address & Other Details:</h3>
+        <form method="post" action="/shop/checkout/">{% csrf_token %}
+            <input type="hidden" name="itemsJson" id="itemsJson">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="name">Name</label>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="Name" required>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="email">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="address1">Address line 1</label>
+                <input type="text" class="form-control" id="address1" name="address1" placeholder="H.no., floor or street" required>
+            </div>
+            <div class="form-group">
+                <label for="address2">Address line 2</label>
+                <input type="text" class="form-control" id="address2" name="address2" placeholder="Apartment, locality, or area" required>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="city">City</label>
+                    <input type="text" class="form-control" id="city" name="city" required>
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="state">State</label>
+                    <input type="text" class="form-control" id="state" name="state"  placeholder="Enter State" required>
+                </div>
+                <div class="form-group col-md-2">
+                    <label for="zip_code">Zip</label>
+                    <input type="text" class="form-control" id="zip_code" name="zip_code" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" class="form-control" id="phone" name="phone" required>
+            </div>
+            <button id="placeOrder" type="submit" class="btn btn-primary">Place Order</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+
 {% block js %}
 <script>
     // Find out the cart items from localStorage
@@ -10,12 +68,50 @@
     } else {
         cart = JSON.parse(localStorage.getItem('cart'));
     }
+    //to fill items in itemsJson to store in the orders table
+    $('#itemsJson').val(JSON.stringify(cart));
+    //if chekcout is true
+    {% if status %}
+        alert('Thanks for ordering with us. Your order id is : {{id}}. Use it to track your order using our order tracker');
+        localStorage.clear();
+        document.location = "/shop";
+    {% endif %}
     updateCartModal(cart);
+    updateReviewItems(cart);
+    
+    //FUNCTIONS
     function clearCart() {
         cart = JSON.parse(localStorage.getItem('cart'));
         localStorage.clear();
         cart = {};
         updateCartModal(cart);
+        updateReviewItems(cart);
     }
+
+    function updateReviewItems(cart){
+        if ($.isEmptyObject(cart)) {
+            //if object is empty
+            mystr = `<h5 style='margin-left:100px; color:red;'>Your cart is empty :-( , please add some items to your cart before checking out!</h5>`;
+            $('#items').html(mystr);
+            $('#placeOrder').prop('disabled', true);
+            $('#totalPrice').html(0);
+        } else {
+            var totalPrice=0;
+            for (item in cart) {
+                let name = cart[item].itemName;
+                let qty = cart[item].qty;
+                let price = cart[item].price;
+                mystr = `<li class="list-group-item d-flex justify-content-between align-items-center">
+                            ${name}
+                            <span class="badge badge-primary badge-pill">${qty}</span>
+                            <span class="float-right">Rs. ${price*qty}</span>
+                        </li>`;
+                $('#items').append(mystr);
+                totalPrice=totalPrice+qty*price;
+            }
+            $('#totalPrice').html(totalPrice);
+        }
+    }
+    
 </script>
 {% endblock %}

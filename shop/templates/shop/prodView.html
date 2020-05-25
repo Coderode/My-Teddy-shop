@@ -5,7 +5,7 @@
 <div class="container my-4">
     <div class="row justify-content-between">
         <div class="col-md-4">
-            <img src="/media/{{product.image}}" width="100%" height="100%">
+            <img src="/media/{{product.image}}" width="100%" height="350px;">
             <hr>
             <button class="btn btn-danger">Buy Now</button>
             <span id="divpr{{product.id}}" class="float-right divpr">
@@ -13,8 +13,8 @@
             </span>
         </div>
         <div class="col-md-7">
-            <h5>{{product.product_name}}</h5>
-            <p><b>Rs.{{product.price}} </b></p>
+            <h5 id="namepr{{product.id}}">{{product.product_name}}</h5>
+            <p><b>Rs.<span id="pricepr{{product.id}}">{{product.price}}</span> </b></p>
             <p>{{product.desc}}</p>
         </div>
     </div>
@@ -33,11 +33,12 @@
   //method on click of the add to card button
   $('.divpr').on('click', 'button.cart', function(){
     var idstr = this.id.toString();
-    var itemName = document.getElementById(idstr).value.toString();
+    var itemName = document.getElementById('name'+idstr).innerHTML;
+    var price = parseInt(document.getElementById('price'+idstr).innerHTML);
     if (cart[idstr] != undefined) {
       cart[idstr].qty = cart[idstr].qty + 1;
     } else {
-      cart[idstr] = {'qty':1,'itemName':itemName};
+      cart[idstr] = {'qty':1,'itemName':itemName,'price':price};
     }
     updateCart(cart);
   });
@@ -47,7 +48,7 @@
       cart['pr' + a].qty = cart['pr' + a].qty - 1;
       cart['pr' + a].qty = Math.max(0, cart['pr' + a].qty);
       if(cart['pr'+a].qty == 0){
-        document.getElementById('divpr' + a).innerHTML = '<button id="pr' + a + '" class="btn btn-primary cart" value="'+cart['pr'+a].itemName+'">Add To Cart</button>';
+        document.getElementById('divpr' + a).innerHTML = '<button id="pr' + a + '" class="btn btn-primary cart">Add To Cart</button>';
       }else{
         document.getElementById('valpr' + a).innerHTML = cart['pr' + a].qty;
       }
@@ -62,8 +63,9 @@
 
   //FUNCTIONS
   function updateCart(cart) {
-    if(cart['pr'+{{product.id}}]!=null && cart['pr'+{{product.id}}].qty>0){
-      document.getElementById('divpr' + {{product.id}}).innerHTML = "<button id='minuspr" + {{product.id}} + "' class='btn btn-primary minus'>-</button> <span id='valpr" + {{product.id}} + "''>" + cart['pr'+{{product.id}}].qty + "</span> <button id='pluspr" + {{product.id}} + "' class='btn btn-primary plus'> + </button>";
+    var id = {{product.id}};
+    if(cart['pr'+id]!=null && cart['pr'+id].qty>0){
+      document.getElementById('divpr' + {{product.id}}).innerHTML = "<button id='minuspr" + id + "' class='btn btn-primary minus'>-</button> <span id='valpr" + id + "''>" + cart['pr'+id].qty + "</span> <button id='pluspr" + id + "' class='btn btn-primary plus'> + </button>";
     }
     localStorage.setItem('cart', JSON.stringify(cart));
     updateCartModal(cart);
@@ -71,7 +73,8 @@
   //function to clear the cart
   function clearCart() {
       cart = JSON.parse(localStorage.getItem('cart'));
-      document.getElementById('divpr' + {{product.id}}).innerHTML = '<button id="pr' + {{product.id}} + '" class="btn btn-primary cart" value="'+cart['pr'+{{product.id}}].itemName+'">Add To Cart</button>';
+      var id = {{product.id}};
+      document.getElementById('divpr' + id).innerHTML = '<button id="pr' + id + '" class="btn btn-primary cart">Add To Cart</button>';
       localStorage.clear();
       cart = {};
       updateCart(cart);

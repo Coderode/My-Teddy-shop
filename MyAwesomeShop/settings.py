@@ -56,7 +56,7 @@ ROOT_URLCONF = 'MyAwesomeShop.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['MyAwesomeShop/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

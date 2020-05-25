@@ -1,22 +1,106 @@
 {% extends 'shop/basic.html' %}
 
 {% block title%}Tracker | My Teddy Shop{% endblock %}
-{% block body %} This is tracker page {% endblock %}
+{% block body %} 
+<div class="container">
+    <div class="col my-4">
+        <h2>Enter your Order Id and Email address to track your order</h2>
+        <form method="post" action="#" id="trackerForm">{% csrf_token %}
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="orderId">Order Id</label>
+                    <input type="text" class="form-control" id="orderId" name="orderId" placeholder="Order Id" required autofocus>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="email">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Track Order</button>
+            </div>
+        </form>
+    </div>
+    <div class="col my-4">
+        <h2>Your Order Status</h2>
+        <div class="my-4">
+            <ul class="list-group" id="items">
+            	Enter your order Id and Email and click Track Order to find details about your order!
+            </ul>
+        </div>
+        <h2>Your Order Details</h2>
+        <div class="my-4">
+            <ul class="list-group" id="citems">
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
 {% block js %}
 <script>
-// Find out the cart items from localStorage
-  if (localStorage.getItem('cart') == null) {
-      var cart = {};
-  } else {
-      cart = JSON.parse(localStorage.getItem('cart'));
-  }
-  updateCartModal(cart);
-  $("#navTracker").addClass("active");
-  function clearCart() {
-      cart = JSON.parse(localStorage.getItem('cart'));
-      localStorage.clear();
-      cart = {};
-      updateCartModal(cart);
-  }
+    // Find out the cart items from localStorage
+    if (localStorage.getItem('cart') == null) {
+        var cart = {};
+    } else {
+        cart = JSON.parse(localStorage.getItem('cart'));
+    }
+    updateCartModal(cart);
+    $("#navTracker").addClass("active");
+
+    $('#trackerForm').submit(function(event) {
+        $('#items').empty();
+        $('#citems').empty();
+        var formData = {
+            'orderId': $('input[name=orderId]').val(),
+            'email': $('input[name=email]').val(),
+            'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
+        };
+        $.ajax({
+                type: 'POST',
+                url: '/shop/tracker/',
+                data: formData,
+                encode: true
+            })
+            .done(function(data) {
+                //console.log(data)
+                //console.log(cart)
+                if (data==1) {
+                    mystr = `<li class="list-group-item d-flex justify-content-between align-items-center">
+                        <h5 style='color:red'>Sorry, We are not able to fetch this order id and email. Make sure to type correct order Id and email</h5></li>`
+                    $('#items').append(mystr);
+                } else {
+                    data = JSON.parse(data);
+                    cart = JSON.parse(data[1]);
+                    updates = data[0];
+                    //update tracking details
+                    for (i = 0; i < updates.length; i++) {
+                        let text = updates[i]['text'];
+                        let time = updates[i]['time'];
+                        mystr = `<li class="list-group-item d-flex justify-content-between align-items-center">
+                        ${text}
+                        <span class="badge badge-primary badge-pill">${time}</span>
+                    </li>`
+                        $('#items').append(mystr);
+                    }
+                    // Fill in the order details
+                    for (item in cart) {
+                        let name = cart[item].itemName;
+                        let qty = cart[item].qty;
+                        mystr = `<li class="list-group-item d-flex justify-content-between align-items-center">
+                            ${name}
+                            <span class="badge badge-primary badge-pill">${qty}</span>
+                        </li>`
+                        $('#citems').append(mystr);
+                    }
+                }
+            });
+        event.preventDefault();
+    });
+
+    //Functions 
+    function clearCart() {
+        cart = JSON.parse(localStorage.getItem('cart'));
+        localStorage.clear();
+        cart = {};
+        updateCartModal(cart);
+    }
 </script>
 {% endblock %}
