@@ -7,7 +7,7 @@
         <div class="col-md-4">
             <img src="/media/{{product.image}}" width="100%" height="350px;">
             <hr>
-            <button class="btn btn-danger">Buy Now</button>
+            <button id="buyButton" class="btn btn-danger">Buy Now</button>
             <span id="divpr{{product.id}}" class="float-right divpr">
               <button id="pr{{product.id}}" class="btn btn-primary cart">Add To Cart</button>
             </span>
@@ -30,7 +30,20 @@
       cart = JSON.parse(localStorage.getItem('cart'));
   }
   updateCart(cart);
-  //method on click of the add to card button
+  //on click on the buy now button
+  $('#buyButton').click(function(){
+    var id = {{product.id}};
+    var idstr = "pr"+ id.toString();
+    var itemName = document.getElementById('name'+idstr).innerHTML;
+    var price = parseInt(document.getElementById('price'+idstr).innerHTML);
+    if(cart[idstr] == undefined){
+      cart[idstr] = {'qty':1,'itemName':itemName,'price':price};
+      localStorage.setItem('cart', JSON.stringify(cart));
+    }
+    //setTimeout('window.location = "/shop/checkout";', 1000);
+    window.location = "/shop/checkout";
+  });
+  //on click of the add to card button
   $('.divpr').on('click', 'button.cart', function(){
     var idstr = this.id.toString();
     var itemName = document.getElementById('name'+idstr).innerHTML;
@@ -49,6 +62,7 @@
       cart['pr' + a].qty = Math.max(0, cart['pr' + a].qty);
       if(cart['pr'+a].qty == 0){
         document.getElementById('divpr' + a).innerHTML = '<button id="pr' + a + '" class="btn btn-primary cart">Add To Cart</button>';
+        delete cart['pr'+a];
       }else{
         document.getElementById('valpr' + a).innerHTML = cart['pr' + a].qty;
       }

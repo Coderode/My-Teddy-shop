@@ -167,6 +167,7 @@ padding:10px;
       cart['pr' + a].qty = Math.max(0, cart['pr' + a].qty);
       if(cart['pr'+a].qty == 0){
         document.getElementById('divpr' + a).innerHTML = '<button id="pr' + a + '" class="btn btn-primary btn-sm cart">Add To Cart</button>';
+        delete cart['pr'+a];  //returns true if deleted
       }else{
         document.getElementById('valpr' + a).innerHTML = cart['pr' + a].qty;
       }

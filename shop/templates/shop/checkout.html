@@ -70,7 +70,8 @@
     }
     //to fill items in itemsJson to store in the orders table
     $('#itemsJson').val(JSON.stringify(cart));
-    //if chekcout is true
+    
+    //if order has been placed then clear the cart
     {% if status %}
         alert('Thanks for ordering with us. Your order id is : {{id}}. Use it to track your order using our order tracker');
         localStorage.clear();
