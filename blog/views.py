@@ -15,9 +15,9 @@ def blogpost(request, id):
     post = Blogpost.objects.filter(post_id = id)[0]  #it returns array and it has only one object so taking 0 index
     if id <= 1 :
         nextPost = Blogpost.objects.filter(post_id = id+1)[0]
-        prevPost = {'obj': 'null'}
+        prevPost = 'null'
     elif id >= total :
-        nextPost = {'obj': 'null'}
+        nextPost = 'null'
         prevPost = Blogpost.objects.filter(post_id = id-1)[0]
     else :
         nextPost = Blogpost.objects.filter(post_id = id+1)[0]

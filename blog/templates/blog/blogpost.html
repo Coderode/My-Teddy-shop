@@ -17,12 +17,42 @@
                 <h2>{{post.head2}}</h2>
                 <p>{{post.chead2}}</p>
             </div><!-- /.blog-post -->
+            <br><br>
+            <!--Facebook like and share plugins-->
+            <div class="fb-like" data-href="http://127.0.0.1:8000/blog/blogpost/{{post.post_id}}" data-width="" data-layout="button_count" data-action="like" data-size="large" data-share="true"></div>
+            <hr>
+            <div class="row justify-content-between container">
+                {% if prevPost != 'null'%}
+                <div class="col-sm-5 card" style="width: 15rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">{{prevPost.title}}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">{{prevPost.head0}}</h6>
+                        <a href="{{prevPost.post_id}}" class="card-link">Previous Post</a>
+                    </div>
+                </div>
+                {% endif %}
+                {% if nextPost != 'null'%}
+                <div class="col-sm-5 card" style="width: 15rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">{{nextPost.title}}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">{{nextPost.head0}}</h6>
+                        <a href="{{nextPost.post_id}}" class="card-link">Next Post</a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            <hr>
+            <!--Facebook comments plugin-->
+            <div class="fb-comments" data-href="http://127.0.0.1:8000/blog/blogpost/{{post.post_id}}" data-numposts="5" data-width="100%"></div>
         </div><!-- /.blog-main -->
 
         <aside class="col-md-4 blog-sidebar">
             <div class="p-4 mb-3 bg-light rounded">
                 <h4 class="font-italic">About</h4>
                 <p class="mb-0">My Teddy Shop<em>started out as a small project and is now</em> the fastest growing e-commerce stores of all times in india and abroad.</p>
+                <br>
+                <!-- Facebook share plugin-->
+                <div class="fb-share-button" data-href="http://127.0.0.1:8000/blog/blogpost/{{post.post_id}}" data-layout="button_count" data-size="large"><a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2F127.0.0.1%3A8000%2Fblog%2Fblogpost%2F2&amp;src=sdkpreparse" class="fb-xfbml-parse-ignore">Share</a></div>
             </div>
             <div class="p-4">
                 <h4 class="font-italic">Elsewhere</h4>
@@ -33,24 +63,6 @@
                 </ol>
             </div>
         </aside><!-- /.blog-sidebar -->
-        <br><br><br>
-        <hr>
-        <div class="row container">
-            <div class="card" style="width: 15rem;">
-                <div class="card-body">
-                    <h5 class="card-title">{{prevPost.title}}</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">{{prevPost.head0}}</h6>
-                    <a href="{{prevPost.post_id}}" class="card-link">Previous Post</a>
-                </div>
-            </div>
-            <div class="card float-right" style="width: 15rem;">
-                <div class="card-body">
-                    <h5 class="card-title">{{nextPost.title}}</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">{{nextPost.head0}}</h6>
-                    <a href="{{nextPost.post_id}}" class="card-link">Next Post</a>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 
