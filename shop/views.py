@@ -7,7 +7,7 @@ from math import ceil
 import json
 from django.views.decorators.csrf import csrf_exempt
 from PayTm import Checksum
-MERCHANT_KEY = 'Your-Merchant-Key-Here'
+MERCHANT_KEY = 'Q74E7We%Bcdjw7dC'
 
 
 # Create your views here.
@@ -88,8 +88,7 @@ def checkout(request):
         update = OrderUpdate(order_id=id, update_desc="The order has been placed")
         update.save()
         param_dict = {
-
-                'MID': 'Your-Merchant-Id-Here',
+                'MID': 'xFCBbJ94852181573190',
                 'ORDER_ID': str(order.order_id),
                 'TXN_AMOUNT': str(amount),
                 'CUST_ID': email,
@@ -97,7 +96,6 @@ def checkout(request):
                 'WEBSITE': 'WEBSTAGING',
                 'CHANNEL_ID': 'WEB',
                 'CALLBACK_URL':'http://127.0.0.1:8000/shop/handlerequest/',
-
         }
         param_dict['CHECKSUMHASH'] = Checksum.generate_checksum(param_dict, MERCHANT_KEY)
         return render(request, 'shop/paytm.html', {'param_dict': param_dict})
