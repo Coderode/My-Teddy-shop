@@ -60,16 +60,15 @@
                 encode: true
             })
             .done(function(data) {
-                //console.log(data)
-                //console.log(cart)
-                if (data==1) {
+                data = JSON.parse(data);
+                if (data['status'] != "success") {
                     mystr = `<li class="list-group-item d-flex justify-content-between align-items-center">
                         <h5 style='color:red'>Sorry, We are not able to fetch this order id and email. Make sure to type correct order Id and email</h5></li>`
                     $('#items').append(mystr);
+                    $('#citems').append(`<li class="list-group-item d-flex justify-content-between align-items-center">
+                        <h5 style='color:red'>No Result Found!</h5></li>`);
                 } else {
-                    data = JSON.parse(data);
-                    cart = JSON.parse(data[1]);
-                    updates = data[0];
+                    updates = data['updates'];
                     //update tracking details
                     for (i = 0; i < updates.length; i++) {
                         let text = updates[i]['text'];
@@ -81,9 +80,10 @@
                         $('#items').append(mystr);
                     }
                     // Fill in the order details
-                    for (item in cart) {
-                        let name = cart[item].itemName;
-                        let qty = cart[item].qty;
+                    orders = JSON.parse(data['itemsJson']);
+                    for (item in orders) {
+                        let name = orders[item].itemName;
+                        let qty = orders[item].qty;
                         mystr = `<li class="list-group-item d-flex justify-content-between align-items-center">
                             ${name}
                             <span class="badge badge-primary badge-pill">${qty}</span>

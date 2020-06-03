@@ -1,6 +1,6 @@
 {% extends 'shop/basic.html' %}
 
-{% block title%}My Teddy Shop{% endblock %}
+{% block title%}My Teddy Shop | E-commerce Website{% endblock %}
 
 {% block css %}
 .carousel-indicators .active{
@@ -37,7 +37,7 @@ height:40px;
 .carousel-control-next{
 top: auto;
 bottom: auto;
-padding-top:11%;
+padding-top:200px;
 }
 .card-body h6{
 padding:2px;
@@ -92,7 +92,7 @@ padding:10px;
             <div class="carousel-item active">
               <div class="card-group">
                 {% for i in product %}
-                  <div class="col-xs-3 col-sm-3 col-md-3">
+                  <div class="col-xs-1 col-sm-2 col-md-3">
                     <div class="card h-100" style="width: 100%">
                       <img src='/media/{{i.image}}' class="card-img-top" alt="...">
                       <div class="card-body">

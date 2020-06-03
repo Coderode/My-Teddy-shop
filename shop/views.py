@@ -7,7 +7,7 @@ from math import ceil
 import json
 from django.views.decorators.csrf import csrf_exempt
 from PayTm import Checksum
-MERCHANT_KEY = ''
+MERCHANT_KEY = 'Merchant key here'
 
 
 # Create your views here.
@@ -23,6 +23,32 @@ def index(request):
         
     params = {'allProds':allProds}
     return render(request,'shop/index.html',params)
+
+
+def searchMatch(query, item):
+    '''return true only if query matches the item'''
+    if query in item.desc.lower() or query in item.product_name.lower() or query in item.category.lower():
+        return True
+    else:
+        return False
+
+def search(request):
+    query = request.GET.get('search')
+    allProds = []
+    catprods = Product.objects.values('category', 'id')
+    cats = {item['category'] for item in catprods}
+    for cat in cats:
+        prodtemp = Product.objects.filter(category=cat)
+        prod = [item for item in prodtemp if searchMatch(query, item)]
+
+        n = len(prod)
+        nSlides = n // 4 + ceil((n / 4) - (n // 4))
+        if len(prod) != 0:
+            allProds.append([prod, range(1, nSlides), nSlides])
+    params = {'allProds': allProds, "msg": ""}
+    if len(allProds) == 0 or len(query)<4:
+        params = {'msg': "Please make sure to enter relevant search query! :-("}
+    return render(request, 'shop/search.html', params)
 
 def about(request):
     return render(request,'shop/about.html')
@@ -52,18 +78,15 @@ def tracker(request):
                 updates = []
                 for item in update:
                     updates.append({'text': item.update_desc, 'time': item.timestamp})
-                    response = json.dumps([updates, order[0].items_json], default=str)
+                    response = json.dumps({"status":"success","updates": updates, "itemsJson": order[0].items_json}, default=str)
                 return HttpResponse(response)
             else:
-                return HttpResponse(1)
+                return HttpResponse('{"status":"noitem"}')   #if no item is there
         except Exception as e:
-            return HttpResponse(1)
+            return HttpResponse('{"status":"error"}')  #if some error occur
 
     return render(request, 'shop/tracker.html')
 
-
-def search(request):
-    return render(request,'shop/search.html')
 
 def productView(request,myid):
     #fetch the product using the id
@@ -89,7 +112,7 @@ def checkout(request):
         update.save()
         # Request paytm to transfer the amount to your account after payment by user
         param_dict = {
-                'MID': '',
+                'MID': 'merchant id here',
                 'ORDER_ID': str(order.order_id),
                 'TXN_AMOUNT': str(amount),
                 'CUST_ID': email,
@@ -117,8 +140,10 @@ def handlerequest(request):
     verify = Checksum.verify_checksum(response_dict, MERCHANT_KEY, checksum)
     if verify:
         if response_dict['RESPCODE'] == '01':
-            print('order successful')
+            # print('order successful')
+            pass
         else:
-            print('order was not successful because' + response_dict['RESPMSG'])
+            # print('order was not successful because' + response_dict['RESPMSG'])
+            pass
     return render(request, 'shop/paymentstatus.html', {'response': response_dict})
 
