@@ -8,8 +8,6 @@ Data base : sqlite inbuilt in Django
 * pip  20.1.1
 ### Requirements : Versions which i have used 
 * Django 3.0.6          : >pip install django
-* asgiref 3.2.7         : >
-* sqlparse 0.3.1        : >
 * pycryptodome 3.9.7    : >pip install pycryptodome
 * Pillow 7.1.2          : >pip install pillow
 pillow - (for opening, manipulating, and saving many different image file formats.)
