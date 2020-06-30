@@ -19,6 +19,11 @@ from django.conf import settings
 from django.conf.urls.static import static
 from . import views
 
+#to make changes in the admin panel of the django
+admin.site.site_header = "MyTeddyShop Admin"
+admin.site.site_title = "MyTeddyShop Admin Panel"
+admin.site.index_title = "MyTeddyShop Admin Panel"
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('shop/',include('shop.urls')),

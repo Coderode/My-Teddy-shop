@@ -7,7 +7,11 @@
         <div class="col-md-4">
             <img src="/media/{{product.image}}" width="100%" height="350px;">
             <hr>
-            <button id="buyButton" class="btn btn-danger">Buy Now</button>
+            {% if request.user.is_authenticated %}
+                <button id="buyButton" class="btn btn-danger">Buy Now</button>
+            {% else %}
+                <a href='#' class="btn btn-danger disabled">Login to Buy</a>
+            {% endif %}
             <span id="divpr{{product.id}}" class="float-right divpr">
               <button id="pr{{product.id}}" class="btn btn-primary cart">Add To Cart</button>
             </span>

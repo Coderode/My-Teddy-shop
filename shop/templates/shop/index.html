@@ -189,6 +189,8 @@ padding:10px;
     for (var item in cart) {
       if(cart[item].qty>0){
         document.getElementById('div' + item).innerHTML = "<button id='minus" + item + "' class='btn btn-primary btn-sm minus'>-</button> <span id='val" + item + "''>" + cart[item].qty + "</span> <button id='plus" + item + "' class='btn btn-primary btn-sm plus'> + </button>";
+      }else{
+        delete cart[item];
       }
     }
     localStorage.setItem('cart', JSON.stringify(cart));
@@ -204,7 +206,12 @@ padding:10px;
       cart = {};
       updateCart(cart);
   }
-  
+  //trigger on clikc on the cart item delete button
+  $('.divCartItemDelete').on("click","button.cartDeleteItem", function() {
+      var item=this.id.toString();
+      cart[item].qty=0; 
+      updateCart(cart);
+  });
   
 </script>
 {% endblock %}

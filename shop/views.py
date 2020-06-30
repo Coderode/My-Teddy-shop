@@ -1,6 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from django.http import HttpResponse
 from . models import Product,Contact,Order,OrderUpdate
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, logout
 from datetime import datetime
 from django.contrib import messages
 from math import ceil
@@ -68,25 +70,26 @@ def contact(request):
     return render(request, 'shop/contact.html')
 
 def tracker(request):
-    if request.method=="POST":
-        orderId = request.POST.get('orderId', '')
-        email = request.POST.get('email', '')
-        try:
-            order = Order.objects.filter(order_id=orderId, email=email)  #it returns in form of a array 
-            if len(order)>0:
-                update = OrderUpdate.objects.filter(order_id=orderId)
-                updates = []
-                for item in update:
-                    updates.append({'text': item.update_desc, 'time': item.timestamp})
-                    response = json.dumps({"status":"success","updates": updates, "itemsJson": order[0].items_json}, default=str)
-                return HttpResponse(response)
-            else:
-                return HttpResponse('{"status":"noitem"}')   #if no item is there
-        except Exception as e:
-            return HttpResponse('{"status":"error"}')  #if some error occur
+    if request.user.is_authenticated:
+        if request.method=="POST":
+            orderId = request.POST.get('orderId', '')
+            email = request.POST.get('email', '')
+            try:
+                order = Order.objects.filter(order_id=orderId, email=email)  #it returns in form of a array 
+                if len(order)>0:
+                    update = OrderUpdate.objects.filter(order_id=orderId)
+                    updates = []
+                    for item in update:
+                        updates.append({'text': item.update_desc, 'time': item.timestamp})
+                        response = json.dumps({"status":"success","updates": updates, "itemsJson": order[0].items_json}, default=str)
+                    return HttpResponse(response)
+                else:
+                    return HttpResponse('{"status":"noitem"}')   #if no item is there
+            except Exception as e:
+                return HttpResponse('{"status":"error"}')  #if some error occur
 
-    return render(request, 'shop/tracker.html')
-
+        return render(request, 'shop/tracker.html')
+    return render(request,'shop/errorpage.html')
 
 def productView(request,myid):
     #fetch the product using the id
@@ -95,37 +98,103 @@ def productView(request,myid):
     return render(request,'shop/prodView.html',{'product':product[0]})
 
 def checkout(request):
-    if request.method=="POST":
-        items_json = request.POST.get('itemsJson', '')
-        name = request.POST.get('name', '')
-        amount = request.POST.get('amount', '')
-        email = request.POST.get('email', '')
-        address = request.POST.get('address1', '') + " " + request.POST.get('address2', '')
-        city = request.POST.get('city', '')
-        state = request.POST.get('state', '')
-        zip_code = request.POST.get('zip_code', '')
-        phone = request.POST.get('phone', '')
-        order = Order(items_json=items_json, name=name,amount=amount, email=email,address=address,city=city,state=state, zip_code=zip_code, phone=phone,date=datetime.today())
-        order.save()
-        id = order.order_id
-        update = OrderUpdate(order_id=id, update_desc="The order has been placed")
-        update.save()
-        # Request paytm to transfer the amount to your account after payment by user
-        param_dict = {
-                'MID': 'merchant id here',
-                'ORDER_ID': str(order.order_id),
-                'TXN_AMOUNT': str(amount),
-                'CUST_ID': email,
-                'INDUSTRY_TYPE_ID': 'Retail',
-                'WEBSITE': 'WEBSTAGING',
-                'CHANNEL_ID': 'WEB',
-                'CALLBACK_URL':'http://127.0.0.1:8000/shop/handlerequest/',
-        }
-        param_dict['CHECKSUMHASH'] = Checksum.generate_checksum(param_dict, MERCHANT_KEY)
-        return render(request, 'shop/paytm.html', {'param_dict': param_dict})
-        # return render(request, 'shop/checkout.html', {'status':True, 'id': id})
-    return render(request, 'shop/checkout.html')
+    if request.user.is_authenticated:
+        if request.method=="POST":
+            items_json = request.POST.get('itemsJson', '')
+            name = request.POST.get('name', '')
+            amount = request.POST.get('amount', '')
+            email = request.POST.get('email', '')
+            address = request.POST.get('address1', '') + " " + request.POST.get('address2', '')
+            city = request.POST.get('city', '')
+            state = request.POST.get('state', '')
+            zip_code = request.POST.get('zip_code', '')
+            phone = request.POST.get('phone', '')
+            order = Order(items_json=items_json, name=name,amount=amount, email=email,address=address,city=city,state=state, zip_code=zip_code, phone=phone,date=datetime.today())
+            order.save()
+            id = order.order_id
+            update = OrderUpdate(order_id=id, update_desc="The order has been placed")
+            update.save()
+            # Request paytm to transfer the amount to your account after payment by user
+            param_dict = {
+                    'MID': 'merchant id here',
+                    'ORDER_ID': str(order.order_id),
+                    'TXN_AMOUNT': str(amount),
+                    'CUST_ID': email,
+                    'INDUSTRY_TYPE_ID': 'Retail',
+                    'WEBSITE': 'WEBSTAGING',
+                    'CHANNEL_ID': 'WEB',
+                    'CALLBACK_URL':'http://127.0.0.1:8000/shop/handlerequest/',
+            }
+            param_dict['CHECKSUMHASH'] = Checksum.generate_checksum(param_dict, MERCHANT_KEY)
+            return render(request, 'shop/paytm.html', {'param_dict': param_dict})
+            # return render(request, 'shop/checkout.html', {'status':True, 'id': id})
+        return render(request, 'shop/checkout.html')
+    return render(request,'shop/errorpage.html')
 
+#authentication APIs
+def handleSignup(request):
+    if request.method == 'POST':
+        #get the post parameter
+        username = request.POST['username']
+        fname = request.POST['fname']
+        lname = request.POST['lname']
+        email = request.POST['email']
+        password1 = request.POST['password1']
+        password2 = request.POST['password2']
+        #checks for user inputs
+        # username length and alphanumeric
+        errors = []
+        if len(username) > 10 or len(username) < 3 or not username.isalnum(): 
+            errors.append('Username length should be between 3 and 10 and it should be alphanumeric!')
+        if len(password1) < 5 or len(password1) > 30:
+            errors.append('Password length should be between 4 and 30!')
+        if len(fname) <3:
+            errors.append('Please enter a valid name!')
+        if password1 != password2:
+            errors.append('Passwords should Match!')
+
+        #if any error occures redirect to home
+        if len(errors) > 0 :
+            for error in errors:
+                messages.error(request,error)
+            return redirect('home')
+
+        #else create the user
+        #create the user
+        try:
+            myuser = User.objects.create_user(username,email,password1)
+            myuser.first_name = fname
+            myuser.last_name = lname
+            myuser.save()
+            messages.success(request,'Your  Account has been successfully created! Now can login Now :-)')
+        except:
+            messages.error(request,'Username already exist please enter another unique username!')
+        return redirect('/')
+    else:
+        return render(request,'shop/errorpage.html')
+
+def handleLogin(request):
+    if request.method == 'POST':
+        #get the post parameters
+        username = request.POST['loginusername']
+        password = request.POST['loginpassword']
+
+        user = authenticate(username= username, password= password)
+        if user is not None:
+            login(request,user)
+            messages.success(request, 'Welcome '+username+', You are successfully logged In!')
+            return redirect('/')
+        else:
+            messages.error(request,'Invalid credentials, Please try again! or signup before login if not registered!')
+            return redirect('/')
+    else:
+        return render(request,'shop/errorpage.html')
+
+def handleLogout(request):
+    if request.user.is_authenticated:
+        logout(request)
+        messages.success(request, 'You are successfully logged out!')
+    return redirect('/')
 
 @csrf_exempt
 def handlerequest(request):
