@@ -83,13 +83,6 @@
     updateReviewItems(cart);
     
     //FUNCTIONS
-    function clearCart() {
-        cart = JSON.parse(localStorage.getItem('cart'));
-        localStorage.clear();
-        cart = {};
-        updateCartModal(cart);
-        updateReviewItems(cart);
-    }
 
     function updateReviewItems(cart){
         if ($.isEmptyObject(cart)) {

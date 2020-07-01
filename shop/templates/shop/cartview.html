@@ -1,0 +1,127 @@
+{% extends 'shop/basic.html' %}
+
+{% block title%}CartView | My Teddy Shop{% endblock title %}
+{% block css %}
+{% endblock css %}
+
+{% block body %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 my-3">
+            
+            <div id="cartTable" class="my-3">
+                <table class='table table-sm'>
+                    <thead class='thead bg-primary' style='color:white;'>
+                        <tr>
+                            <th scope='col'>#</th>
+                            <th scope='col'>Item</th>
+                            <th scope='col'>Qty</th>
+                            <th scope='col'>Price</th>
+                            <th scope='col'></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <h6 style='color:white; padding:10px;' class='bg-primary'>Total Items : <span
+                        id="cartTotalItems">0</span></h6>
+                <h6 style='color:white; padding:10px;' class='bg-primary'>Total Price : <span
+                        id="cartTotalPrice">0</span></h6>
+            </div>
+            <div class="my-3">
+                {% if request.user.is_authenticated %}
+                <a href='/shop/checkout' id='checkout' class="btn btn-danger float-right">Checkout</a>
+                {% else %}
+                <a href='#' class="btn btn-danger disabled float-right">Login to checkout</a>
+                {% endif %}
+                <button class='mx-2 btn btn-warning float-left' onclick='clearCart()' id='clearCart'>Clear Cart</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock body %}
+
+{% block js %}
+<script>
+    // Find out the cart items from localStorage
+    var cart = {};
+    if (localStorage.getItem('cart') == null) {
+        var cart = {};
+        localStorage.setItem('cart', JSON.stringify(cart));
+    } else {
+        cart = JSON.parse(localStorage.getItem('cart'));
+    }
+    fillTable(cart);
+    updateCartModal(cart);
+    //trigger on clikc on the cart item delete button
+    $('.divCartItemDelete').on("click", "button.cartDeleteItem", function () {
+        var item = this.id.toString();
+        delete cart[item];
+        location.reload();
+        fillTable(cart);
+        updateCartModal(cart);
+    });
+    // If plus or minus button is clicked, change the cart as well as the display value
+    $('.divpr').on("click", "button.minus", function() {
+        a = this.id.slice(7, );
+        cart['pr' + a].qty = cart['pr' + a].qty - 1;
+        cart['pr' + a].qty = Math.max(0, cart['pr' + a].qty);
+        if(cart['pr'+a].qty == 0){
+            delete cart['pr'+a];  //returns true if deleted
+        }else{
+            document.getElementById('valpr' + a).innerHTML = cart['pr' + a].qty;
+        }
+        location.reload();
+        fillTable(cart);
+        updateCartModal(cart);
+    });
+    $('.divpr').on("click", "button.plus", function() {
+        a = this.id.slice(6, );
+        cart['pr' + a].qty = cart['pr' + a].qty + 1;
+        document.getElementById('valpr' + a).innerHTML = cart['pr' + a].qty;
+        location.reload();
+        fillTable(cart);
+        updateCartModal(cart);
+    });
+    //function to create table
+    function fillTable(cart) {
+        var sum = 0;
+        var popStr = "";
+        var i = 1;
+        var totalPrice = 0;
+        for (var item in cart) {
+            if (cart[item].qty > 0) {
+                popStr = popStr+ "<tr><th scope='row'>" + i + "</th><td>";
+                popStr = popStr+ cart[item].itemName + "</td>";
+                popStr += "<td><span class='divpr'><button id='minus" + item + "' class='btn btn-primary btn-sm minus'>-</button> <span id='val" + item + "''>" + cart[item].qty + "</span> <button id='plus" + item + "' class='btn btn-primary btn-sm plus'> + </button></span></td>";
+                popStr = popStr+ "<td>" + cart[item].qty + "x" + cart[item].price + "</td>";
+                popStr = popStr+ "<td><span class='divCartItemDelete'><button class='btn btn-danger btn-sm float-right cartDeleteItem' id='" + item + "' >delete</button></span>" + "</td></tr>";
+                i = i + 1;
+            }
+            sum = sum + cart[item].qty;
+            totalPrice += cart[item].qty * cart[item].price;
+        }
+        if (sum == 0) {
+            popStr = "<h4 style='color:red; text-align:center;'>Nothing in Your cart! :-(</h4>";
+            $('#checkout').addClass("disabled");
+            $('#clearCart').prop('disabled', true);
+        } else {
+            $('#checkout').removeClass("disabled");
+            $('#clearCart').prop('disabled', false);
+        }
+        $('#cartTable table tbody').html(popStr);
+        $('#cartTotalItems').html(sum);
+        $('#cartTotalPrice').html(totalPrice);
+        localStorage.setItem('cart', JSON.stringify(cart));
+    }
+    //function to clear the cart
+    function clearCart() {
+        cart = JSON.parse(localStorage.getItem('cart'));
+        localStorage.clear();
+        cart={};
+        fillTable(cart);
+        updateCartModal(cart);
+    }
+
+</script>
+{% endblock js %}

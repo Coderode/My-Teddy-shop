@@ -26,6 +26,8 @@ def index(request):
     params = {'allProds':allProds}
     return render(request,'shop/index.html',params)
 
+def cartView(request):
+    return render(request,'shop/cartview.html')
 
 def searchMatch(query, item):
     '''return true only if query matches the item'''

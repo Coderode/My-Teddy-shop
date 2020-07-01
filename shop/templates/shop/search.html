@@ -199,21 +199,6 @@ padding:10px;
     localStorage.setItem('cart', JSON.stringify(cart));
     updateCartModal(cart);
   }
-  //function to clear the cart
-  function clearCart() {
-      cart = JSON.parse(localStorage.getItem('cart'));
-      {% for product,range,nSlides in allProds %}
-        {% for i in product %}
-            var item = "pr"+{{i.id}};
-            if(item in cart){
-                document.getElementById('div' + item).innerHTML = '<button id="' + item + '" class="btn btn-primary btn-sm cart">Add To Cart</button>';
-            }
-        {% endfor %}
-      {% endfor %}
-      localStorage.clear();
-      cart = {};
-      updateCart(cart);
-  }
   
   
 </script>

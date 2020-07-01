@@ -93,13 +93,5 @@
             });
         event.preventDefault();
     });
-
-    //Functions 
-    function clearCart() {
-        cart = JSON.parse(localStorage.getItem('cart'));
-        localStorage.clear();
-        cart = {};
-        updateCartModal(cart);
-    }
 </script>
 {% endblock %}

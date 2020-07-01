@@ -88,15 +88,6 @@
     localStorage.setItem('cart', JSON.stringify(cart));
     updateCartModal(cart);
   }
-  //function to clear the cart
-  function clearCart() {
-      cart = JSON.parse(localStorage.getItem('cart'));
-      var id = {{product.id}};
-      document.getElementById('divpr' + id).innerHTML = '<button id="pr' + id + '" class="btn btn-primary cart">Add To Cart</button>';
-      localStorage.clear();
-      cart = {};
-      updateCart(cart);
-  }
   
 </script>
 {% endblock %}

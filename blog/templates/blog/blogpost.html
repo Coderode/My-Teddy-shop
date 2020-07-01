@@ -1,9 +1,18 @@
 {% extends 'blog/basic.html' %}
+{% block css %}
+    
+    body{
+        background:url('/media/site-images/bg-12.png');
+        background-size: 100% 100%;
+        background-attachment:fixed;
+    }
+    
+{% endblock css %}
 
 {% block body %}
 <div class="container">
     <div class="row mt-4">
-        <div class="col-md-8 blog-main">
+        <div class="col-md-8 blog-main bg-white p-4">
             <h1 class="font-italic">
                 {{post.title}}
             </h1>
@@ -54,7 +63,7 @@
                 <!-- Facebook share plugin-->
                 <div class="fb-share-button" data-href="http://127.0.0.1:8000/blog/blogpost/{{post.post_id}}" data-layout="button_count" data-size="large"><a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2F127.0.0.1%3A8000%2Fblog%2Fblogpost%2F2&amp;src=sdkpreparse" class="fb-xfbml-parse-ignore">Share</a></div>
             </div>
-            <div class="p-4">
+            <div class="p-4 bg-white">
                 <h4 class="font-italic">Elsewhere</h4>
                 <ol class="list-unstyled">
                     <li><a href="#">GitHub</a></li>

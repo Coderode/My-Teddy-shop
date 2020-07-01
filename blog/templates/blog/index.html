@@ -1,12 +1,20 @@
 {% extends 'blog/basic.html' %}
 {% block title %}Blog | My Teddy Shop{% endblock %}
-
+{% block css %}
+body{
+        background:url('/media/site-images/bg-5.png');
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-position:100% 100% center;
+        background-size:cover;
+    }
+{% endblock css %}
 {% block body %}
 <div class="container">
     <div class="row my-3">
         {% for i in allPosts %}
             <div class="col-md-6">
-                <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+                <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative bg-white">
                     <div class="col p-4 d-flex flex-column position-static">
                         <strong class="d-inline-block mb-2 text-primary">{{i.title}}</strong>
                         <h3 class="mb-0">{{i.head0}}</h3>
