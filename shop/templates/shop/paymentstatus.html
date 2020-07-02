@@ -2,18 +2,33 @@
 {% block title%} My Awesome Cart Tracker{% endblock %}
 {% block body %}
 <div class="container">
-    {{response}}
     <div class="col my-4">
-        <h2>Payment status regarding your order Id {{response.ORDERID}}</h2>
+        <h2>Payment status regarding your order {{response.ORDERID}}</h2>
+        
         {% if response.RESPCODE == '01' %}
-            ORDER SUCCESS
+            <h4 style="color:green" class="my-3">Your Order has been Placed Successfully your transaction details are here. :-)</h4>
+            <table class="table">
+            <tbody>
+                <tr><th scope="row">STATUS</th><td>TXN SUCCESSFULL</td></tr>
+                <tr><th scope="row">ORDER ID</th><td>{{response.ORDERID}}</td></tr>
+                <tr><th scope="row">AMOUNT</th><td>{{response.TXNAMOUNT}}</td></tr>
+                <tr><th scope="row">CURRENCY</th><td>{{response.CURRENCY}}</td></tr>
+                <tr><th scope="row">TIME</th><td>{{response.TXNDATE}}</td></tr>
+                <tr><th scope="row">PAYMENT MODE</th><td>{{response.PAYMENTMODE}}</td></tr>
+            </tbody>
+        </table>
         {% else %}
-            ORDER FAILURE
+            <h4 style="color:red" class="my-3">Some Error Occured during the payment please try Again Later! :-(</h4>
+            <h6 style="color:black" class="my-3">Status : Payment Pending...</h6>
         {% endif%}
     </div>
 </div>
 {% endblock %}
 {% block js %}
 <script>
+//if order has been placed then clear the cart
+{% if response.RESPCODE == '01' %}
+    localStorage.clear();
+{% endif %}
 </script>
 {% endblock %}

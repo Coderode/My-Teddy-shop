@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect
 from django.http import HttpResponse
-from . models import Product,Contact,Order,OrderUpdate
+from . models import Product,Contact,Order,OrderUpdate,Transaction
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from datetime import datetime
@@ -9,7 +9,7 @@ from math import ceil
 import json
 from django.views.decorators.csrf import csrf_exempt
 from PayTm import Checksum
-MERCHANT_KEY = 'Merchant key here'
+MERCHANT_KEY = 'YOUR-MERCHANT-KEY-HERE'
 
 
 # Create your views here.
@@ -75,7 +75,7 @@ def tracker(request):
     if request.user.is_authenticated:
         if request.method=="POST":
             orderId = request.POST.get('orderId', '')
-            email = request.POST.get('email', '')
+            email = request.user.email
             try:
                 order = Order.objects.filter(order_id=orderId, email=email)  #it returns in form of a array 
                 if len(order)>0:
@@ -99,13 +99,32 @@ def productView(request,myid):
     # print(product)
     return render(request,'shop/prodView.html',{'product':product[0]})
 
+def myorders(request):
+    if request.user.is_authenticated:
+        email = request.user.email
+        Orders={}
+        try:
+            orders = Order.objects.filter(email=email)  #it returns in form of a array 
+            allOrders=[]
+            for item in orders:
+                allOrders.append({'order_id':item.order_id,'amount':item.amount,'date':item.date})
+            Orders={'allOrders':allOrders}
+        except Exception as e:
+            Orders = {'allOrders':[]}
+        return render(request,'shop/myorders.html',Orders)  #if some error occur
+    else:
+        return render(request,'shop/errorpage.html')
+
 def checkout(request):
     if request.user.is_authenticated:
+        user = request.user
+        name = user.first_name+user.last_name
+        email = user.email
+        userDetails={'name':name,'email':email}
+
         if request.method=="POST":
             items_json = request.POST.get('itemsJson', '')
-            name = request.POST.get('name', '')
             amount = request.POST.get('amount', '')
-            email = request.POST.get('email', '')
             address = request.POST.get('address1', '') + " " + request.POST.get('address2', '')
             city = request.POST.get('city', '')
             state = request.POST.get('state', '')
@@ -114,11 +133,11 @@ def checkout(request):
             order = Order(items_json=items_json, name=name,amount=amount, email=email,address=address,city=city,state=state, zip_code=zip_code, phone=phone,date=datetime.today())
             order.save()
             id = order.order_id
-            update = OrderUpdate(order_id=id, update_desc="The order has been placed")
+            update = OrderUpdate(order_id=id, update_desc="The order requested")
             update.save()
             # Request paytm to transfer the amount to your account after payment by user
             param_dict = {
-                    'MID': 'merchant id here',
+                    'MID': 'YOUR-MERCHANT-ID-HERE',
                     'ORDER_ID': str(order.order_id),
                     'TXN_AMOUNT': str(amount),
                     'CUST_ID': email,
@@ -129,8 +148,7 @@ def checkout(request):
             }
             param_dict['CHECKSUMHASH'] = Checksum.generate_checksum(param_dict, MERCHANT_KEY)
             return render(request, 'shop/paytm.html', {'param_dict': param_dict})
-            # return render(request, 'shop/checkout.html', {'status':True, 'id': id})
-        return render(request, 'shop/checkout.html')
+        return render(request, 'shop/checkout.html',{'userDetails':userDetails})
     return render(request,'shop/errorpage.html')
 
 #authentication APIs
@@ -200,21 +218,27 @@ def handleLogout(request):
 
 @csrf_exempt
 def handlerequest(request):
-    # paytm will send you post request here
-    form = request.POST
-    response_dict = {}
-    for i in form.keys():
-        response_dict[i] = form[i]
-        if i == 'CHECKSUMHASH':
-            checksum = form[i]
+    if request.method == "POST":
+        # paytm will send you post request here
+        form = request.POST
+        response_dict = {}
+        for i in form.keys():
+            response_dict[i] = form[i]
+            if i == 'CHECKSUMHASH':
+                checksum = form[i]
 
-    verify = Checksum.verify_checksum(response_dict, MERCHANT_KEY, checksum)
-    if verify:
-        if response_dict['RESPCODE'] == '01':
-            # print('order successful')
-            pass
-        else:
-            # print('order was not successful because' + response_dict['RESPMSG'])
-            pass
-    return render(request, 'shop/paymentstatus.html', {'response': response_dict})
+        verify = Checksum.verify_checksum(response_dict, MERCHANT_KEY, checksum)
+        if verify:
+            id = response_dict['ORDERID']
+            if response_dict['RESPCODE'] == '01':
+                update = OrderUpdate(order_id=id, update_desc="Transaction has been made and The order has been placed successfully!")
+                update.save()
+                transaction = Transaction(order_id = id, txn = response_dict)
+                transaction.save()
+            else:
+                update = OrderUpdate(order_id=id, update_desc="Transaction Pending...")
+                update.save()
+        return render(request, 'shop/paymentstatus.html', {'response': response_dict})
+    else:
+        return render(request,'shop/errorpage.html')
 

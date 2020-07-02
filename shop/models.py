@@ -31,7 +31,7 @@ class Contact(models.Model):
 
 class Order(models.Model):
     order_id = models.AutoField(primary_key=True)
-    items_json = models.CharField(max_length=5000)
+    items_json = models.TextField()
     amount = models.IntegerField( default=0)
     name = models.CharField(max_length=50)
     email = models.CharField(max_length=50)
@@ -53,3 +53,12 @@ class OrderUpdate(models.Model):
 
     def __str__(self):
         return "order:"+str(self.order_id)+" update:"+str(self.update_id)+" "+self.timestamp.strftime("%d-%b-%Y")
+
+class Transaction(models.Model):
+    id = models.AutoField(primary_key=True)
+    order_id = models.IntegerField(default="")
+    txn = models.TextField()
+    timestamp = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return "order:"+str(self.order_id)+" "+self.timestamp.strftime("%d-%b-%Y")
