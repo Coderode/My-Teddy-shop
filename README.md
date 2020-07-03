@@ -1,5 +1,6 @@
 # My-Teddy-shop
 ### E-commerce website with a blog - Python Django Framework 
+### live link (heroku deployment : Just for Demo ) https://my-teddy-shop.herokuapp.com/
 Data base : sqlite inbuilt in Django
 
 
