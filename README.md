@@ -17,3 +17,39 @@ pip install -r requirements.txt   [make sure python and pip is installed on your
 
 ### To Run the server in this folder write [>python manage.py runserver] in the commad prompt or terminal(pythonn3 in linux OS)
 * it will create local server
+### Front Page
+![font page](https://github.com/Coderode/Images/blob/master/myteddyshop/front.JPG)
+
+### Home Page
+![font page](https://github.com/Coderode/Images/blob/master/myteddyshop/homepage.JPG)
+
+### Login
+![font page](https://github.com/Coderode/Images/blob/master/myteddyshop/login.JPG)
+
+### Signup
+![font page](https://github.com/Coderode/Images/blob/master/myteddyshop/signup.JPG)
+
+### Loginoption
+![font page](https://github.com/Coderode/Images/blob/master/myteddyshop/loginoption.JPG)
+
+### Contact Page
+![font page](https://github.com/Coderode/Images/blob/master/myteddyshop/contact.JPG)
+
+### About page
+![font page](https://github.com/Coderode/Images/blob/master/myteddyshop/about.JPG)
+
+### Blog Page
+![font page](https://github.com/Coderode/Images/blob/master/myteddyshop/blog.JPG)
+
+### My Cart
+![font page](https://github.com/Coderode/Images/blob/master/myteddyshop/cart.JPG)
+
+### Checkoutpage
+![font page](https://github.com/Coderode/Images/blob/master/myteddyshop/checkoutpage.JPG)
+
+### Tracker
+![font page](https://github.com/Coderode/Images/blob/master/myteddyshop/tracker.JPG)
+
+
+
+
